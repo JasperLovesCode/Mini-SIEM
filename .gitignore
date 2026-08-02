@@ -1,0 +1,4 @@
+# Ignore entire local logs directory and sensitive binaries
+logs/
+*.evtx
+*.json
