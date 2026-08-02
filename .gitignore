@@ -2,3 +2,6 @@
 logs/
 *.evtx
 *.json
+
+__pycache__/
+*.py[cod]

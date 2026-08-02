@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import List, Dict, Optional
 from normalizers.base import NormalizedEvent
 from threat_engine.models import Alert
+from application.notification import send_notification
 
 class DetectionEngine:
     def __init__(self):
@@ -63,7 +64,14 @@ class DetectionEngine:
             # Clear or reset window to prevent continuous alert spamming on every subsequent failure
             count = len(self.failed_logons[ip])
             self.failed_logons[ip] = [] 
-            
+
+            send_notification(
+                title="Brute Force Alert",
+                message=f"Detected {count} failed logon attempts from IP {ip} within 60 seconds.",
+                app_name="Mini-SIEM",
+                timeout=10
+            )
+
             return Alert(
                 rule_name="BRUTE_FORCE_DETECTED",
                 severity="HIGH",
@@ -73,11 +81,21 @@ class DetectionEngine:
                 target_user=event.user,
                 log_source=event.log_source
             )
+        
+
         return None
 
     def check_privilege_escalation(self, event: NormalizedEvent) -> Optional[Alert]:
         """Rule: Trigger alert when a user is added to local Admin Group (Event 4732)."""
         if event.event_id == "4732":
+
+            send_notification(
+                title="Privilege Escalation Alert",
+                message=f"User '{event.user}' was added to a local security-enabled administrative group.",
+                app_name="Mini-SIEM",
+                timeout=10
+            )
+
             return Alert(
                 rule_name="PRIVILEGE_ESCALATION_ADMIN_ADDED",
                 severity="HIGH",
@@ -92,6 +110,13 @@ class DetectionEngine:
     def check_log_tampering(self, event: NormalizedEvent) -> Optional[Alert]:
         """Rule: Trigger CRITICAL alert if Windows Audit Logs are cleared (Event 1102)."""
         if event.event_id == "1102":
+            send_notification(
+                title="Log Tampering Alert",
+                message=f"The Windows Security audit log was cleared by user '{event.user}'.",
+                app_name="Mini-SIEM",
+                timeout=10
+            )
+
             return Alert(
                 rule_name="AUDIT_LOG_CLEARED",
                 severity="CRITICAL",
