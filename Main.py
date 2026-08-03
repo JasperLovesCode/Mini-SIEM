@@ -3,8 +3,9 @@ import os
 import sys
 from typing import List
 
+
 # Ensure the root folder is accessible for imports
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from Evtx.Evtx import Evtx
 from normalizers.windows_security import WindowsSecurityNormalizer
@@ -79,7 +80,7 @@ def process_and_detect(evtx_path: str, max_records: int = 1000):
 
 if __name__ == "__main__":
     # Point to your binary log file inside logs/
-    LOG_FILE_PATH = "logs/Security.evtx"
+    LOG_FILE_PATH = r"C:\Windows\System32\Winevt\Logs\Security.evtx"
     
     # Analyze the first 1000 records
-    process_and_detect(LOG_FILE_PATH, max_records=1000)
+    process_and_detect(LOG_FILE_PATH, max_records=100000)
